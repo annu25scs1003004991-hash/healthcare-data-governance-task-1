@@ -1,44 +1,47 @@
-# Exception Log
+# Exception Log — Healthcare Data Governance and Cleaning
 
-## Validation Summary
+## Purpose
 
-| Check | Result | Action |
-|---|---:|---|
-| Duplicate PatientID | 0 found | No changes required |
-| Missing values | 0 found | No changes required |
-| Invalid Age | 0 found | No changes required |
-| Invalid TreatmentDurationDays | 0 found | No changes required |
-| Invalid Readmitted value | 0 found | No changes required |
-| Invalid BloodPressure format | 0 found | No changes required |
-| Invalid CholesterolLevel | 0 found | No changes required |
-| Invalid DosageMg | 0 found | No changes required |
+This exception log records data-quality observations identified during validation of the synthetic/de-identified patient dataset.
 
-## Governance Observation
+The log follows a conservative approach: clinical values are not invented, guessed, or changed without an explicit and unambiguous rule.
 
-### Medication Dosage Unit
+## Validation Exceptions and Observations
 
-The `DosageMg` column records medication dosage in milligrams. Medication
-dosages are medication-specific, so the unit and interpretation should remain
-explicit.
+| ID     | Field                 | Record      | Observation                                                      | Action Taken                        | Reason                                                                           |
+| ------ | --------------------- | ----------- | ---------------------------------------------------------------- | ----------------------------------- | -------------------------------------------------------------------------------- |
+| EX-001 | DosageMg              | PAT-210     | Levothyroxine dosage is recorded as `0.05 mg`                    | Retained as supplied and documented | Dosage interpretation is medication-specific and no conversion rule was provided |
+| EX-002 | PatientID             | All records | Duplicate PatientIDs were checked                                | No action required                  | All 10 PatientIDs were unique                                                    |
+| EX-003 | Missing values        | All records | Missing-value check performed                                    | No action required                  | No missing values were identified                                                |
+| EX-004 | Age                   | All records | Age values checked for numeric type and reasonable range         | No action required                  | No invalid age values were identified                                            |
+| EX-005 | TreatmentDurationDays | All records | Treatment duration checked for positive numeric values           | No action required                  | No invalid treatment durations were identified                                   |
+| EX-006 | Readmitted            | All records | Readmission values checked against `Yes`/`No`                    | No action required                  | No invalid categories were identified                                            |
+| EX-007 | BloodPressure         | All records | Blood pressure values checked for `systolic/diastolic` structure | No action required                  | No invalid formats were identified                                               |
+| EX-008 | CholesterolLevel      | All records | Cholesterol values checked for numeric type                      | No action required                  | No invalid numeric values were identified                                        |
 
-The Levothyroxine record contains `0.05 mg`. This value was retained exactly
-as supplied because changing it to another number could introduce an
-unsupported clinical transformation.
+## Summary
 
-### Recommended Improvement
+* Total records reviewed: 10
+* Confirmed duplicate PatientIDs: 0
+* Missing values identified: 0
+* Invalid age values: 0
+* Invalid treatment durations: 0
+* Invalid readmission values: 0
+* Invalid blood pressure formats: 0
+* Invalid cholesterol values: 0
+* Invalid dosage values based on the defined structural validation: 0
+* Clinical values deleted or replaced: 0
 
-For a production healthcare dataset, medication dosage should have a clearly
-documented unit and, ideally, a medication-specific dosage standard.
+## Cleaning Decision
 
-## Cleaning Principle
+No patient records were deleted.
 
-No clinical values were invented, estimated, or replaced.
+No clinical values were replaced with guessed or estimated values.
 
-Cleaning was limited to validation, documentation, and identification of
-potential data-quality and governance risks.
+The Levothyroxine dosage of `0.05 mg` was retained because the supplied task does not provide sufficient information to justify changing or converting the value. It is documented as a data-quality observation for further review rather than treated as a confirmed clinical error.
 
-## Final Status
+## Governance Note
 
-The supplied dataset passed the basic validation checks.
+An exception does not necessarily mean that a value is clinically wrong. Exceptions may identify values requiring additional context, documentation, or domain review.
 
-No records required deletion or replacement.
+This exercise is for data-quality and governance training and does not provide clinical advice or establish medical correctness.
